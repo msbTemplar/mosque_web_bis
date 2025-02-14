@@ -116,7 +116,15 @@
                             <h1 class="mb-0">Every Muslim Needs To Realise The Importance Of The "Pillar" Of Islam</h1>
                         </div>
                         <div class="col-lg-3">
-                            <a href="" class="btn btn-light py-2 px-4">Learn More</a>
+                            <!-- <a href="" class="btn btn-light py-2 px-4">Learn More</a> -->
+                            {% for learn_more in learn_mores %}
+                                    <a href="{% if learn_more.learn_more_url %}{{ learn_more.learn_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-light py-2 px-4"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionLearnMore(event, this, '{{ learn_more.id }}')"
+                                    {% endif %} >{{ learn_more.learn_more_nombre }} </a>
+                     
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

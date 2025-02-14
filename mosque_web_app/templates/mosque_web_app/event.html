@@ -116,7 +116,20 @@
                     <h4 class="mb-3">{{ event.title_event }}</h4>
                     <p class="mb-4">{{ event.description_title_event }}</p>
                     {% if event.link_event %}
-                    <a href="{{ event.link_event }}" class="btn btn-primary px-3" target="_blank">Join Now</a>
+                    <a href="{{ event.link_event }}" class="btn btn-primary px-3" target="_blank"
+                    
+                    {% for join_now in join_nows %}
+                            {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionJoinNow(event, this, '{{ join_now.id }}')"
+                            {% endif %}
+                    >
+                        <!-- Join Now -->
+                        {{ join_now.join_now_nombre }}
+
+                    {% endfor %}
+                
+                
+                </a>
                     {% endif %}
                 </div>
             </div>

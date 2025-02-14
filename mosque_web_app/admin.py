@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ContactMessage,About,Activity,Event,Error404,Sermon,Blog,TeamMember,Testimonial,Newsletter,AboutImages, Footer, Post, Donation, Page, ContactInfo, BestVideos, Tab, TabPage
+from .models import ContactMessage,About,Activity,Event,Error404,Sermon,Blog,TeamMember,Testimonial,Newsletter,AboutImages, Footer, Post, Donation, Page, ContactInfo, BestVideos, Tab, TabPage, ReadMore, LearnMore, JoinNow, MoreDetails, DonateNow
 # Register your models here.
 
 #admin.site.register(ContactMessage)
@@ -24,6 +24,12 @@ admin.site.register(ContactInfo)
 admin.site.register(BestVideos)
 admin.site.register(Tab)
 admin.site.register(TabPage)
+admin.site.register(ReadMore)
+admin.site.register(LearnMore)
+admin.site.register(JoinNow)
+admin.site.register(MoreDetails)
+admin.site.register(DonateNow)
+
 #admin.site.register(AboutImages)
 
 @admin.register(AboutImages)

@@ -107,8 +107,11 @@ urlpatterns = [
     path('actualizar_nombre_tab/', views.actualizar_nombre_tab, name='actualizar_nombre_tab'),
     path('actualizar_nombre_tab_page/', views.actualizar_nombre_tab_page, name='actualizar_nombre_tab_page'),
     path('tab_admin/', views.tab_admin, name='tab_admin'),
-
-
+    path('actualizar_nombre_read_more/', views.actualizar_nombre_read_more, name='actualizar_nombre_read_more'),
+    path('actualizar_nombre_learn_more/', views.actualizar_nombre_learn_more, name='actualizar_nombre_learn_more'),
+    path('actualizar_nombre_join_now/', views.actualizar_nombre_join_now, name='actualizar_nombre_join_now'),
+    path('actualizar_nombre_more_details/', views.actualizar_nombre_more_details, name='actualizar_nombre_more_details'),
+    path('actualizar_nombre_donate_now/', views.actualizar_nombre_donate_now, name='actualizar_nombre_donate_now')
 
 
 ]

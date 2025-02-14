@@ -178,7 +178,15 @@
                             <h1 class="mb-0">Every Muslim Needs To Realise The Importance Of The "Pillar" Of Islam</h1>
                         </div>
                         <div class="col-lg-3">
-                            <a href="" class="btn btn-light py-2 px-4">Learn More</a>
+                            <!-- <a href="" class="btn btn-light py-2 px-4">Learn More</a> -->
+                            {% for learn_more in learn_mores %}
+                                    <a href="{% if learn_more.learn_more_url %}{{ learn_more.learn_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-light py-2 px-4"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionLearnMore(event, this, '{{ learn_more.id }}')"
+                                    {% endif %} >{{ learn_more.learn_more_nombre }} </a>
+                     
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -274,7 +282,15 @@
                             <div class="ms-4">
                                 <h4>{{ last_activity.activity_mosque_development }}</h4>
                                 <p class="mb-4">{{ last_activity.description_activity_mosque_development }}</p>
-                                <a href="" class="btn btn-primary px-3">Read More</a>
+                                <!-- <a href="" class="btn btn-primary px-3">Read More</a> -->
+                                {% for read_more in read_mores %}
+                                    <a href="{% if read_more.read_more_url %}{{ read_more.read_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-primary px-3"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionReadMore(event, this, '{{ read_more.id }}')"
+                                    {% endif %} >{{ read_more.read_more_nombre }} </a>
+                     
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -284,7 +300,15 @@
                             <div class="ms-4">
                                 <h4>{{ last_activity.activity_charity_donation }}</h4>
                                 <p class="mb-4">{{ last_activity.description_activity_charity_donation }}</p>
-                                <a href="" class="btn btn-primary px-3">Read More</a>
+                                <!-- <a href="" class="btn btn-primary px-3">Read More</a> -->
+                                {% for read_more in read_mores %}
+                                    <a href="{% if read_more.read_more_url %}{{ read_more.read_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-primary px-3"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionReadMore(event, this, '{{ read_more.id }}')"
+                                    {% endif %} >{{ read_more.read_more_nombre }} </a>
+                     
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -294,7 +318,15 @@
                             <div class="ms-4">
                                 <h4>{{ last_activity.activity_quran_learning }}</h4>
                                 <p class="mb-4">{{ last_activity.description_activity_quran_learning }}</p>
-                                <a href="" class="btn btn-primary px-3">Read More</a>
+                                <!-- <a href="" class="btn btn-primary px-3">Read More</a> -->
+                                {% for read_more in read_mores %}
+                                    <a href="{% if read_more.read_more_url %}{{ read_more.read_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-primary px-3"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionReadMore(event, this, '{{ read_more.id }}')"
+                                    {% endif %} >{{ read_more.read_more_nombre }} </a>
+                     
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -304,7 +336,15 @@
                             <div class="ms-4">
                                 <h4>{{ last_activity.activity_hadith_sunnah }}Hadith & Sunnah</h4>
                                 <p class="mb-4">{{ last_activity.description_activity_hadith_sunnah }}</p>
-                                <a href="" class="btn btn-primary px-3">Read More</a>
+                                <!-- <a href="" class="btn btn-primary px-3">Read More</a> -->
+                                {% for read_more in read_mores %}
+                                    <a href="{% if read_more.read_more_url %}{{ read_more.read_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-primary px-3"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionReadMore(event, this, '{{ read_more.id }}')"
+                                    {% endif %} >{{ read_more.read_more_nombre }} </a>
+                     
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -314,7 +354,15 @@
                             <div class="ms-4">
                                 <h4>{{ last_activity.activity_parent_education }}</h4>
                                 <p class="mb-4">{{ last_activity.description_activity_parent_education }}</p>
-                                <a href="" class="btn btn-primary px-3">Read More</a>
+                                <!-- <a href="" class="btn btn-primary px-3">Read More</a> -->
+                                {% for read_more in read_mores %}
+                                    <a href="{% if read_more.read_more_url %}{{ read_more.read_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-primary px-3"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionReadMore(event, this, '{{ read_more.id }}')"
+                                    {% endif %} >{{ read_more.read_more_nombre }} </a>
+                     
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -324,7 +372,15 @@
                             <div class="ms-4">
                                 <h4>{{ last_activity.activity_help_orphans }}</h4>
                                 <p class="mb-4">{{ last_activity.description_activity_help_orphans }}</p>
-                                <a href="" class="btn btn-primary px-3">Read More</a>
+                                <!-- <a href="" class="btn btn-primary px-3">Read More</a> -->
+                                {% for read_more in read_mores %}
+                                    <a href="{% if read_more.read_more_url %}{{ read_more.read_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-primary px-3"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionReadMore(event, this, '{{ read_more.id }}')"
+                                    {% endif %} >{{ read_more.read_more_nombre }} </a>
+                     
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -426,7 +482,17 @@
                     <h4 class="mb-3">{{ event.title_event }}</h4>
                     <p class="mb-4">{{ event.description_title_event }}</p>
                     {% if event.link_event %}
-                    <a href="{{ event.link_event }}" class="btn btn-primary px-3" target="_blank">Join Now</a>
+                    <a href="{{ event.link_event }}" class="btn btn-primary px-3" target="_blank"
+                    {% for join_now in join_nows %}
+                            {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionJoinNow(event, this, '{{ join_now.id }}')"
+                            {% endif %}
+                    >
+                        <!-- Join Now -->
+                        {{ join_now.join_now_nombre }}
+
+                    {% endfor %}
+                    </a>
                     {% endif %}
                 </div>
             </div>
@@ -699,7 +765,17 @@
                         <!-- Título y descripción del blog -->
                         <a href="{{ blog.link_blog }}" class="d-inline-block h4 lh-sm mb-3">{{ blog.blog_title }}</a>
                         <p class="mb-4">{{ blog.description_blog }}</p>
-                        <a href="{{ blog.link_blog }}" class="btn btn-primary px-3">More Details</a>
+                        <a href="{{ blog.link_blog }}" class="btn btn-primary px-3"
+                        {% for more_details in more_detailss %}
+                            {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionMoreDetails(event, this, '{{ more_details.id }}')"
+                            {% endif %}
+                        >
+                        <!-- More Details -->
+                        {{ more_details.more_details_nombre }}
+
+                        {% endfor %}
+                    </a>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import ContactMessage, About, Activity, Event, Error404, Sermon, Blog, TeamMember, Testimonial, Newsletter, AboutImages, Footer, Donation, Post, Page, ContactInfo, BestVideos, Tab, TabPage
+from .models import ContactMessage, About, Activity, Event, Error404, Sermon, Blog, TeamMember, Testimonial, Newsletter, AboutImages, Footer, Donation, Post, Page, ContactInfo, BestVideos, Tab, TabPage, ReadMore, LearnMore, JoinNow, MoreDetails, DonateNow
 import json
 from django.core.exceptions import ValidationError
 
@@ -23,6 +23,390 @@ from django.contrib.auth.models import User
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Ya existe un usuario con este correo electrónico.")
         return email """
+
+class DonateNowForm(forms.ModelForm):
+    class Meta:
+        model = DonateNow
+        fields = [
+            'donate_now_nombre',
+            'donate_now_slug',
+            'donate_now_description',
+            'donate_now_url',
+            'donate_now_img_url',
+            'donate_now_file',
+            'donate_now_date_page',
+            'donate_now_time_page',
+            'donate_now_day_page',
+            'is_active'
+        ]
+        widgets = {
+            'donate_now_nombre': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese el nombre',
+                'style': 'height: 55px;',
+            }),
+            'donate_now_slug': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Slug automático basado en el nombre',
+                'style': 'height: 55px;',
+            }),
+            'donate_now_description': forms.Textarea(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la descripción',
+                'style': 'height: 150px;',
+            }),
+            'donate_now_url': forms.URLInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la URL',
+                'style': 'height: 55px;',
+            }),
+            'donate_now_img_url': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'donate_now_file': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'donate_now_date_page': forms.DateInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Fecha de Donate Now',
+                'type': 'date',
+            }),
+            'donate_now_time_page': forms.TimeInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Hora de Donate Now',
+                'type': 'time',
+            }),
+            'donate_now_day_page': forms.Select(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'style': 'margin-top: 10px;',
+            }),
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Si el slug está vacío, lo genera automáticamente
+        if not instance.donate_now_slug:
+            instance.donate_now_slug = slugify(instance.donate_now_nombre)
+        
+        if commit:
+            instance.save()
+        return instance
+
+
+class MoreDetailsForm(forms.ModelForm):
+    class Meta:
+        model = MoreDetails
+        fields = [
+            'more_details_nombre',
+            'more_details_slug',
+            'more_details_description',
+            'more_details_url',
+            'more_details_img_url',
+            'more_details_file',
+            'more_details_date_page',
+            'more_details_time_page',
+            'more_details_day_page',
+            'is_active'
+        ]
+        widgets = {
+            'more_details_nombre': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese el nombre',
+                'style': 'height: 55px;',
+            }),
+            'more_details_slug': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Slug automático basado en el nombre',
+                'style': 'height: 55px;',
+            }),
+            'more_details_description': forms.Textarea(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la descripción',
+                'style': 'height: 150px;',
+            }),
+            'more_details_url': forms.URLInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la URL',
+                'style': 'height: 55px;',
+            }),
+            'more_details_img_url': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'more_details_file': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'more_details_date_page': forms.DateInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Fecha de More Details',
+                'type': 'date',
+            }),
+            'more_details_time_page': forms.TimeInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Hora de More Details',
+                'type': 'time',
+            }),
+            'more_details_day_page': forms.Select(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'style': 'margin-top: 10px;',
+            }),
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Si el slug está vacío, lo genera automáticamente
+        if not instance.more_details_slug:
+            instance.more_details_slug = slugify(instance.more_details_nombre)
+        
+        if commit:
+            instance.save()
+        return instance
+
+
+
+class JoinNowForm(forms.ModelForm):
+    class Meta:
+        model = JoinNow
+        fields = [
+            'join_now_nombre',
+            'join_now_slug',
+            'join_now_description',
+            'join_now_url',
+            'join_now_img_url',
+            'join_now_file',
+            'join_now_date_page',
+            'join_now_time_page',
+            'join_now_day_page',
+            'is_active'
+        ]
+        widgets = {
+            'join_now_nombre': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese el nombre',
+                'style': 'height: 55px;',
+            }),
+            'join_now_slug': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Slug automático basado en el nombre',
+                'style': 'height: 55px;',
+            }),
+            'join_now_description': forms.Textarea(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la descripción',
+                'style': 'height: 150px;',
+            }),
+            'join_now_url': forms.URLInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la URL',
+                'style': 'height: 55px;',
+            }),
+            'join_now_img_url': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'join_now_file': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'join_now_date_page': forms.DateInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Fecha de Join Now',
+                'type': 'date',
+            }),
+            'join_now_time_page': forms.TimeInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Hora de Join Now',
+                'type': 'time',
+            }),
+            'join_now_day_page': forms.Select(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'style': 'margin-top: 10px;',
+            }),
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Si el slug está vacío, lo genera automáticamente
+        if not instance.join_now_slug:
+            instance.join_now_slug = slugify(instance.join_now_nombre)
+        
+        if commit:
+            instance.save()
+        return instance
+
+
+
+
+class LearnMoreForm(forms.ModelForm):
+    class Meta:
+        model = LearnMore
+        fields = [
+            'learn_more_nombre',
+            'learn_more_slug',
+            'learn_more_description',
+            'learn_more_url',
+            'learn_more_img_url',
+            'learn_more_file',
+            'learn_more_date_page',
+            'learn_more_time_page',
+            'learn_more_day_page',
+            'is_active'
+        ]
+        widgets = {
+            'learn_more_nombre': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese el nombre',
+                'style': 'height: 55px;',
+            }),
+            'learn_more_slug': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Slug automático basado en el nombre',
+                'style': 'height: 55px;',
+            }),
+            'learn_more_description': forms.Textarea(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la descripción',
+                'style': 'height: 150px;',
+            }),
+            'learn_more_url': forms.URLInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la URL',
+                'style': 'height: 55px;',
+            }),
+            'learn_more_img_url': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'learn_more_file': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'learn_more_date_page': forms.DateInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Fecha de Learn More',
+                'type': 'date',
+            }),
+            'learn_more_time_page': forms.TimeInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Hora de Learn More',
+                'type': 'time',
+            }),
+            'learn_more_day_page': forms.Select(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'style': 'margin-top: 10px;',
+            }),
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Si el slug está vacío, lo genera automáticamente
+        if not instance.learn_more_slug:
+            instance.learn_more_slug = slugify(instance.learn_more_nombre)
+        
+        if commit:
+            instance.save()
+        return instance
+
+
+class ReadMoreForm(forms.ModelForm):
+    class Meta:
+        model = ReadMore
+        fields = [
+            'read_more_nombre',
+            'read_more_slug',
+            'read_more_description',
+            'read_more_url',
+            'read_more_img_url',
+            'read_more_file',
+            'read_more_date_page',
+            'read_more_time_page',
+            'read_more_day_page',
+            'is_active'
+        ]
+        widgets = {
+            'read_more_nombre': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese el nombre',
+                'style': 'height: 55px;',
+            }),
+            'read_more_slug': forms.TextInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Slug automático basado en el nombre',
+                'style': 'height: 55px;',
+            }),
+            'read_more_description': forms.Textarea(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la descripción',
+                'style': 'height: 150px;',
+            }),
+            'read_more_url': forms.URLInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Ingrese la URL',
+                'style': 'height: 55px;',
+            }),
+            'read_more_img_url': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'read_more_file': forms.ClearableFileInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'read_more_date_page': forms.DateInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Fecha de Read More',
+                'type': 'date',
+            }),
+            'read_more_time_page': forms.TimeInput(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'placeholder': 'Hora de Read More',
+                'type': 'time',
+            }),
+            'read_more_day_page': forms.Select(attrs={
+                'class': 'form-control border-1 bg-light px-4',
+                'style': 'height: 55px;',
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'style': 'margin-top: 10px;',
+            }),
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Si el slug está vacío, lo genera automáticamente
+        if not instance.read_more_slug:
+            instance.read_more_slug = slugify(instance.read_more_nombre)
+        
+        if commit:
+            instance.save()
+        return instance
+
+
         
 class TabPageForm(forms.ModelForm):
     class Meta:

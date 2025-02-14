@@ -225,7 +225,18 @@
                         <div class="hero-header-inner animated zoomIn">
                             <p class="fs-4 text-dark">{{ page.title }}</p>
                             <h1 class="display-1 mb-5 text-dark">{{ page.purity_comes_from_faith }}</h1>
-                            <a href="" class="btn btn-primary py-3 px-5">Read More</a>
+                            <!-- <a href="" class="btn btn-primary py-3 px-5">Read More</a> -->
+                            {% for read_more in read_mores %}
+                                    <a href="{% if read_more.read_more_url %}{{ read_more.read_more_url }}{% else %}#{% endif %}" 
+                                    class="btn btn-primary py-3 px-5"
+                                    {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionReadMore(event, this, '{{ read_more.id }}')"
+                                    {% endif %}
+                                >
+                             {{ read_more.read_more_nombre }}
+                         </a>
+                         
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -388,7 +399,18 @@
                 <div class="footer-item mt-5">
                     <h4 class="text-light mb-4">THE<span class="text-primary">Mosque</span></h4>
                     <p class="mb-4 text-secondary">{{ footer.themosque_description_footer }}</p>
-                    <a href="{{ footer_link_footer }}" class="btn btn-primary py-2 px-4">Donate Now</a>
+                    <a href="{{ footer_link_footer }}" class="btn btn-primary py-2 px-4"
+                    {% for donate_now in donate_nows %}
+                            {% if user.is_authenticated %}
+                                    oncontextmenu="activarEdicionDonateNow(event, this, '{{ donate_now.id }}')"
+                            {% endif %}
+                    >
+                    <!-- Donate Now -->
+                    {{ donate_now.donate_now_nombre }}
+
+                    {% endfor %}
+                
+                </a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-6 col-xl-3">
@@ -560,6 +582,304 @@
                 });
             }
         </script> -->
+
+        <script>
+            function activarEdicionDonateNow(event, elemento, donate_now_id) {
+                // Prevenir el menú contextual (clic derecho)
+                event.preventDefault();
+            
+                // Verificar si el enlace ya está en modo de edición
+                if (!elemento.hasAttribute('contenteditable')) {
+                    // Habilitar edición
+                    elemento.setAttribute("contenteditable", "true");
+                    elemento.focus();  // Poner foco en el enlace para que se pueda editar
+            
+                    // Cuando el campo pierda el foco (cuando el usuario haga clic fuera del enlace)
+                    elemento.onblur = function() {
+                        actualizarNombreDonateNow(donate_now_id, elemento);
+                    };
+            
+                    // Permitir que el usuario presione Enter para guardar el nombre
+                    elemento.onkeydown = function(event) {
+                        if (event.key === "Enter") {
+                            actualizarNombreDonateNow(donate_now_id, elemento);
+                        }
+                    };
+                }
+            }
+        
+            function actualizarNombreDonateNow(donate_now_id, elemento) {
+                let nuevoNombre = elemento.textContent.trim();  // Obtener el nuevo texto dentro del <a>
+            
+                // Realizar la solicitud AJAX para actualizar el nombre
+                $.ajax({
+                    url: "{% url 'actualizar_nombre_donate_now' %}",
+                    type: "POST",
+                    data: {
+                        "donate_now_id": donate_now_id,
+                        "nuevo_nombre": nuevoNombre,
+                        "csrfmiddlewaretoken": "{{ csrf_token }}"
+                    },
+                    success: function (data) {
+                        if (data.status === "success") {
+                            console.log("Nombre actualizado: " + data.nuevo_nombre);
+                            // Actualizar la interfaz con el nuevo nombre
+                            elemento.textContent = data.nuevo_nombre;
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Error al actualizar el nombre de Donate Now.");
+                    }
+                });
+            
+                // Deshabilitar la edición después de guardar el nombre
+                elemento.removeAttribute("contenteditable");
+            }
+        </script>
+        
+
+        <script>
+            function activarEdicionMoreDetails(event, elemento, more_details_id) {
+                // Prevenir el menú contextual (clic derecho)
+                event.preventDefault();
+            
+                // Verificar si el enlace ya está en modo de edición
+                if (!elemento.hasAttribute('contenteditable')) {
+                    // Habilitar edición
+                    elemento.setAttribute("contenteditable", "true");
+                    elemento.focus();  // Poner foco en el enlace para que se pueda editar
+            
+                    // Cuando el campo pierda el foco (cuando el usuario haga clic fuera del enlace)
+                    elemento.onblur = function() {
+                        actualizarNombreMoreDetails(more_details_id, elemento);
+                    };
+            
+                    // Permitir que el usuario presione Enter para guardar el nombre
+                    elemento.onkeydown = function(event) {
+                        if (event.key === "Enter") {
+                            actualizarNombreMoreDetails(more_details_id, elemento);
+                        }
+                    };
+                }
+            }
+            
+            function actualizarNombreMoreDetails(more_details_id, elemento) {
+                let nuevoNombre = elemento.textContent.trim();  // Obtener el nuevo texto dentro del <a>
+            
+                // Realizar la solicitud AJAX para actualizar el nombre
+                $.ajax({
+                    url: "{% url 'actualizar_nombre_more_details' %}",
+                    type: "POST",
+                    data: {
+                        "more_details_id": more_details_id,
+                        "nuevo_nombre": nuevoNombre,
+                        "csrfmiddlewaretoken": "{{ csrf_token }}"
+                    },
+                    success: function (data) {
+                        if (data.status === "success") {
+                            console.log("Nombre actualizado: " + data.nuevo_nombre);
+                            // Actualizar la interfaz con el nuevo nombre
+                            elemento.textContent = data.nuevo_nombre;
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Error al actualizar el nombre de More Details.");
+                    }
+                });
+            
+                // Deshabilitar la edición después de guardar el nombre
+                elemento.removeAttribute("contenteditable");
+            }
+        </script>
+        
+
+        <script>
+            function activarEdicionJoinNow(event, elemento, join_now_id) {
+                // Prevenir el menú contextual (clic derecho)
+                event.preventDefault();
+            
+                // Verificar si el enlace ya está en modo de edición
+                if (!elemento.hasAttribute('contenteditable')) {
+                    // Habilitar edición
+                    elemento.setAttribute("contenteditable", "true");
+                    elemento.focus();  // Poner foco en el enlace para que se pueda editar
+            
+                    // Cuando el campo pierda el foco (cuando el usuario haga clic fuera del enlace)
+                    elemento.onblur = function() {
+                        actualizarNombreJoinNow(join_now_id, elemento);
+                    };
+            
+                    // Permitir que el usuario presione Enter para guardar el nombre
+                    elemento.onkeydown = function(event) {
+                        if (event.key === "Enter") {
+                            actualizarNombreJoinNow(join_now_id, elemento);
+                        }
+                    };
+                }
+            }
+                        
+            function actualizarNombreJoinNow(join_now_id, elemento) {
+                let nuevoNombre = elemento.textContent.trim();  // Obtener el nuevo texto dentro del <a>
+            
+                // Realizar la solicitud AJAX para actualizar el nombre
+                $.ajax({
+                    url: "{% url 'actualizar_nombre_join_now' %}",
+                    type: "POST",
+                    data: {
+                        "join_now_id": join_now_id,
+                        "nuevo_nombre": nuevoNombre,
+                        "csrfmiddlewaretoken": "{{ csrf_token }}"
+                    },
+                    success: function (data) {
+                        if (data.status === "success") {
+                            console.log("Nombre actualizado: " + data.nuevo_nombre);
+                            // Actualizar la interfaz con el nuevo nombre
+                            elemento.textContent = data.nuevo_nombre;
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Error al actualizar el nombre join now.");
+                    }
+                });
+            
+                // Deshabilitar la edición después de guardar el nombre
+                elemento.removeAttribute("contenteditable");
+            }
+            
+            
+            
+            
+            
+        </script>
+
+        
+        <script>
+            function activarEdicionLearnMore(event, elemento, learn_more_id) {
+                // Prevenir el menú contextual (clic derecho)
+                event.preventDefault();
+            
+                // Verificar si el enlace ya está en modo de edición
+                if (!elemento.hasAttribute('contenteditable')) {
+                    // Habilitar edición
+                    elemento.setAttribute("contenteditable", "true");
+                    elemento.focus();  // Poner foco en el enlace para que se pueda editar
+            
+                    // Cuando el campo pierda el foco (cuando el usuario haga clic fuera del enlace)
+                    elemento.onblur = function() {
+                        actualizarNombreLearnMore(learn_more_id, elemento);
+                    };
+            
+                    // Permitir que el usuario presione Enter para guardar el nombre
+                    elemento.onkeydown = function(event) {
+                        if (event.key === "Enter") {
+                            actualizarNombreLearnMore(learn_more_id, elemento);
+                        }
+                    };
+                }
+            }
+                        
+            function actualizarNombreLearnMore(learn_more_id, elemento) {
+                let nuevoNombre = elemento.textContent.trim();  // Obtener el nuevo texto dentro del <a>
+            
+                // Realizar la solicitud AJAX para actualizar el nombre
+                $.ajax({
+                    url: "{% url 'actualizar_nombre_learn_more' %}",
+                    type: "POST",
+                    data: {
+                        "learn_more_id": learn_more_id,
+                        "nuevo_nombre": nuevoNombre,
+                        "csrfmiddlewaretoken": "{{ csrf_token }}"
+                    },
+                    success: function (data) {
+                        if (data.status === "success") {
+                            console.log("Nombre actualizado: " + data.nuevo_nombre);
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Error al actualizar el nombre.");
+                    }
+                });
+            
+                // Deshabilitar la edición después de guardar el nombre
+                elemento.removeAttribute("contenteditable");
+            }
+            
+            
+            
+            
+            
+        </script>
+        
+        
+
+
+        <script>
+            function activarEdicionReadMore(event, elemento, read_more_id) {
+                // Prevenir el menú contextual (clic derecho)
+                event.preventDefault();
+            
+                // Verificar si el enlace ya está en modo de edición
+                if (!elemento.hasAttribute('contenteditable')) {
+                    // Habilitar edición
+                    elemento.setAttribute("contenteditable", "true");
+                    elemento.focus();  // Poner foco en el enlace para que se pueda editar
+            
+                    // Cuando el campo pierda el foco (cuando el usuario haga clic fuera del enlace)
+                    elemento.onblur = function() {
+                        actualizarNombreReadMore(read_more_id, elemento);
+                    };
+            
+                    // Permitir que el usuario presione Enter para guardar el nombre
+                    elemento.onkeydown = function(event) {
+                        if (event.key === "Enter") {
+                            actualizarNombreReadMore(read_more_id, elemento);
+                        }
+                    };
+                }
+            }
+                        
+            function actualizarNombreReadMore(read_more_id, elemento) {
+                let nuevoNombre = elemento.textContent.trim();  // Obtener el nuevo texto dentro del <a>
+            
+                // Realizar la solicitud AJAX para actualizar el nombre
+                $.ajax({
+                    url: "{% url 'actualizar_nombre_read_more' %}",
+                    type: "POST",
+                    data: {
+                        "read_more_id": read_more_id,
+                        "nuevo_nombre": nuevoNombre,
+                        "csrfmiddlewaretoken": "{{ csrf_token }}"
+                    },
+                    success: function (data) {
+                        if (data.status === "success") {
+                            console.log("Nombre actualizado: " + data.nuevo_nombre);
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Error al actualizar el nombre.");
+                    }
+                });
+            
+                // Deshabilitar la edición después de guardar el nombre
+                elemento.removeAttribute("contenteditable");
+            }
+            
+            
+            
+            
+            
+        </script>
+
 
         <script>
             function activarEdicionTabPage(event, elemento, page_id) {

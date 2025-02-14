@@ -5,14 +5,112 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from django.http import JsonResponse
 import locale
-from .forms import ContactMessageForm,AboutForm,ActivityForm, EventForm,Error404Form,SermonForm,BlogForm, TeamMemberForm, TestimonialForm, NewsletterForm, AboutImagesForm, FooterForm, DonationForm, PostForm, ContactInfoForm, PageForm,CustomUserCreationForm, BestVideosForm, TabForm
+from .forms import ContactMessageForm,AboutForm,ActivityForm, EventForm,Error404Form,SermonForm,BlogForm, TeamMemberForm, TestimonialForm, NewsletterForm, AboutImagesForm, FooterForm, DonationForm, PostForm, ContactInfoForm, PageForm,CustomUserCreationForm, BestVideosForm, TabForm, ReadMoreForm, LearnMoreForm, JoinNowForm, MoreDetailsForm, DonateNowForm
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 import json
-from .models import ContactMessage, About, Activity, Event, Error404, Sermon, Blog, TeamMember, Testimonial, AboutImages, Footer, Donation, Post, ContactInfo, Page, BestVideos, Tab, TabPage
+from .models import ContactMessage, About, Activity, Event, Error404, Sermon, Blog, TeamMember, Testimonial, AboutImages, Footer, Donation, Post, ContactInfo, Page, BestVideos, Tab, TabPage, ReadMore, LearnMore, JoinNow, MoreDetails, DonateNow
 from django.contrib.auth.views import LoginView
 from django.views.decorators.cache import cache_page
 # Create your views here.
+
+@csrf_exempt
+def actualizar_nombre_donate_now(request):
+    if request.method == "POST":
+        donate_now_id = request.POST.get("donate_now_id")
+        nuevo_nombre = request.POST.get("nuevo_nombre", "").strip()
+
+        if not nuevo_nombre:
+            return JsonResponse({"status": "error", "message": "El nombre no puede estar vacío."})
+        
+        try:
+            donate_now = DonateNow.objects.get(id=donate_now_id)
+            donate_now.donate_now_nombre = nuevo_nombre
+            donate_now.save()
+            return JsonResponse({"status": "success", "nuevo_nombre": nuevo_nombre})
+        except DonateNow.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "No se encontró la sección."}, status=404)
+
+    return JsonResponse({"status": "error", "message": "Método no permitido."}, status=400)
+
+
+@csrf_exempt
+def actualizar_nombre_more_details(request):
+    if request.method == "POST":
+        more_details_id = request.POST.get("more_details_id")
+        nuevo_nombre = request.POST.get("nuevo_nombre", "").strip()
+
+        if not nuevo_nombre:
+            return JsonResponse({"status": "error", "message": "El nombre no puede estar vacío."})
+        
+        try:
+            more_details = MoreDetails.objects.get(id=more_details_id)
+            more_details.more_details_nombre = nuevo_nombre
+            more_details.save()
+            return JsonResponse({"status": "success", "nuevo_nombre": nuevo_nombre})
+        except MoreDetails.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "No se encontró la sección."}, status=404)
+
+    return JsonResponse({"status": "error", "message": "Método no permitido."}, status=400)
+
+
+@csrf_exempt
+def actualizar_nombre_join_now(request):
+    if request.method == "POST":
+        join_now_id = request.POST.get("join_now_id")
+        nuevo_nombre = request.POST.get("nuevo_nombre", "").strip()
+
+        if not nuevo_nombre:
+            return JsonResponse({"status": "error", "message": "El nombre no puede estar vacío."})
+        
+        try:
+            join_now = JoinNow.objects.get(id=join_now_id)
+            join_now.join_now_nombre = nuevo_nombre
+            join_now.save()
+            return JsonResponse({"status": "success", "nuevo_nombre": nuevo_nombre})
+        except JoinNow.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "No se encontró la pestaña."}, status=404)
+
+    return JsonResponse({"status": "error", "message": "Método no permitido."}, status=400)
+
+@csrf_exempt
+def actualizar_nombre_learn_more(request):
+    if request.method == "POST":
+        learn_more_id = request.POST.get("learn_more_id")
+        nuevo_nombre = request.POST.get("nuevo_nombre", "").strip()
+
+        if not nuevo_nombre:
+            return JsonResponse({"status": "error", "message": "El nombre no puede estar vacío."})
+
+        try:
+            learn_more = LearnMore.objects.get(id=learn_more_id)
+            learn_more.learn_more_nombre = nuevo_nombre
+            learn_more.save()
+            return JsonResponse({"status": "success", "nuevo_nombre": nuevo_nombre})
+        except LearnMore.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "No se encontró la pestaña."}, status=404)
+
+    return JsonResponse({"status": "error", "message": "Método no permitido."}, status=400)
+
+
+@csrf_exempt
+def actualizar_nombre_read_more(request):
+    if request.method == "POST":
+        read_more_id = request.POST.get("read_more_id")
+        nuevo_nombre = request.POST.get("nuevo_nombre", "").strip()
+
+        if not nuevo_nombre:
+            return JsonResponse({"status": "error", "message": "El nombre no puede estar vacío."})
+
+        try:
+            read_more = ReadMore.objects.get(id=read_more_id)
+            read_more.read_more_nombre = nuevo_nombre
+            read_more.save()
+            return JsonResponse({"status": "success", "nuevo_nombre": nuevo_nombre})
+        except ReadMore.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "No se encontró la pestaña."}, status=404)
+
+    return JsonResponse({"status": "error", "message": "Método no permitido."}, status=400)
 
 @csrf_exempt
 def actualizar_nombre_tab(request):
@@ -82,6 +180,18 @@ def register(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
 
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -149,6 +259,8 @@ def register(request):
         'page': page,
         'tabs': tabs,
         'tab_pages': tab_pages,
+        'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
     })
 
 
@@ -175,6 +287,18 @@ class CustomLoginView(LoginView):
         tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
         
         tab_pages = TabPage.objects.all()
+        
+        read_mores = ReadMore.objects.filter(is_active=True)
+    
+        learn_mores = LearnMore.objects.filter(is_active=True)
+        
+        join_now = JoinNow.objects.filter(is_active=True).last()
+        
+        join_nows = JoinNow.objects.filter(is_active=True)
+        
+        more_detailss = MoreDetails.objects.filter(is_active=True)
+        
+        donate_nows = DonateNow.objects.filter(is_active=True)
 
         # Obtener el último footer (si existe)
         footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -216,6 +340,8 @@ class CustomLoginView(LoginView):
             'page': page,
             'tabs': tabs,
             'tab_pages': tab_pages,
+            'read_mores':read_mores,
+            'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
         })
 
         return context
@@ -237,6 +363,18 @@ def newsletter(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -301,7 +439,8 @@ def newsletter(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def privacy_policy(request):
     return render(request, 'mosque_web_app/privacy_policy.html')
@@ -326,6 +465,18 @@ def view_404(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -366,7 +517,8 @@ def view_404(request):
         'page': page,
         'error_data': error_data,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/404.html',context )
 
 def view_404_admin(request):
@@ -384,6 +536,18 @@ def view_404_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -459,7 +623,8 @@ def view_404_admin(request):
             'contact_info': contact_info,
             'page': page,
             'tabs': tabs,
-            'tab_pages': tab_pages,})
+            'tab_pages': tab_pages,'read_mores':read_mores,
+            'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = Error404Form()
     
@@ -479,7 +644,8 @@ def view_404_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_view_404_admin_view(request):
     page = (
@@ -496,6 +662,18 @@ def list_view_404_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -535,7 +713,8 @@ def list_view_404_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_view_404_admin(request, id_view_404_admin):
     page = (
@@ -552,6 +731,18 @@ def actualizar_view_404_admin(request, id_view_404_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -595,7 +786,8 @@ def actualizar_view_404_admin(request, id_view_404_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_view_404_admin.html', context)
 
 def eliminar_view_404_admin(request, id_view_404_admin):
@@ -619,6 +811,18 @@ def testimonial(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -660,7 +864,8 @@ def testimonial(request):
         'page': page,
         'testimonials': testimonials,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/testimonial.html',context )
 
 def testimonial_admin(request):
@@ -678,6 +883,18 @@ def testimonial_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -789,7 +1006,8 @@ def testimonial_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = TestimonialForm()
     
@@ -809,7 +1027,8 @@ def testimonial_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_testimonial_admin_view(request):
     page = (
@@ -826,6 +1045,18 @@ def list_testimonial_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -865,7 +1096,8 @@ def list_testimonial_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_testimonial_admin(request, id_testimonial_admin):
     page = (
@@ -882,6 +1114,18 @@ def actualizar_testimonial_admin(request, id_testimonial_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -925,7 +1169,8 @@ def actualizar_testimonial_admin(request, id_testimonial_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_testimonial_admin.html', context)
 
 def eliminar_testimonial_admin(request, id_testimonial_admin):
@@ -950,6 +1195,18 @@ def team(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -987,7 +1244,8 @@ def team(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/team.html',context )
 
 def team_admin(request):
@@ -1005,6 +1263,18 @@ def team_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1120,7 +1390,8 @@ def team_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = TeamMemberForm()
     
@@ -1140,7 +1411,8 @@ def team_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_team_admin_view(request):
     page = (
@@ -1157,6 +1429,18 @@ def list_team_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1196,7 +1480,8 @@ def list_team_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_team_admin(request, id_team_admin):
     page = (
@@ -1213,6 +1498,18 @@ def actualizar_team_admin(request, id_team_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1256,7 +1553,8 @@ def actualizar_team_admin(request, id_team_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_team_admin.html', context)
 
 def eliminar_team_admin(request, id_team_admin):
@@ -1282,6 +1580,18 @@ def blog(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1322,7 +1632,8 @@ def blog(request):
         'contact_info': contact_info,
         'page': page, 'blogs': blogs,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/blog.html',context )
 
 def blogs_admin(request):
@@ -1340,6 +1651,18 @@ def blogs_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1426,7 +1749,8 @@ def blogs_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = BlogForm()
     
@@ -1446,7 +1770,8 @@ def blogs_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_blogs_admin_view(request):
     page = (
@@ -1463,6 +1788,18 @@ def list_blogs_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1502,7 +1839,8 @@ def list_blogs_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
         })
 
 def actualizar_blogs_admin(request, id_blogs_admin):
@@ -1520,6 +1858,18 @@ def actualizar_blogs_admin(request, id_blogs_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1563,7 +1913,8 @@ def actualizar_blogs_admin(request, id_blogs_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_blogs_admin.html', context)
 
 def eliminar_blogs_admin(request, id_blogs_admin):
@@ -1587,6 +1938,18 @@ def sermon(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1626,7 +1989,8 @@ def sermon(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     #context = {'form': ''}
     return render(request, 'mosque_web_app/sermon.html',context )
 
@@ -1645,6 +2009,18 @@ def sermons_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1731,7 +2107,8 @@ def sermons_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = SermonForm()
     
@@ -1751,7 +2128,8 @@ def sermons_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_sermons_admin_view(request):
     page = (
@@ -1768,6 +2146,18 @@ def list_sermons_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1807,7 +2197,8 @@ def list_sermons_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_sermons_admin(request, id_sermons_admin):
     page = (
@@ -1824,6 +2215,18 @@ def actualizar_sermons_admin(request, id_sermons_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1867,7 +2270,8 @@ def actualizar_sermons_admin(request, id_sermons_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_sermons_admin.html', context)
 
 def eliminar_sermons_admin(request, id_sermons_admin):
@@ -1891,6 +2295,18 @@ def event(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -1932,7 +2348,8 @@ def event(request):
         'contact_info': contact_info,
         'page': page, 'events': events,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/event.html',context )
 
 def events_admin(request):
@@ -1950,6 +2367,18 @@ def events_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2034,7 +2463,8 @@ def events_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = EventForm()
     
@@ -2054,7 +2484,8 @@ def events_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_events_admin_view(request):
     page = (
@@ -2071,6 +2502,18 @@ def list_events_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2110,7 +2553,8 @@ def list_events_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_events_admin(request, id_events_admin):
     page = (
@@ -2127,6 +2571,18 @@ def actualizar_events_admin(request, id_events_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2170,7 +2626,8 @@ def actualizar_events_admin(request, id_events_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_events_admin.html', context)
 
 def eliminar_events_admin(request, id_events_admin):
@@ -2194,6 +2651,18 @@ def activity(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     testimonials = Testimonial.objects.all() if Testimonial.objects.exists() else None
     
@@ -2236,7 +2705,8 @@ def activity(request):
         'footer_site_name_footer': footer_site_name_footer,
         'contact_info': contact_info,
         'page': page,'last_activity': last_activity, 'testimonials': testimonials,'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/activity.html',context )
 
 def activities_admin(request):
@@ -2254,6 +2724,18 @@ def activities_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2352,7 +2834,8 @@ def activities_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = ActivityForm()
     
@@ -2372,7 +2855,8 @@ def activities_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_activities_admin_view(request):
     page = (
@@ -2389,6 +2873,18 @@ def list_activities_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2428,7 +2924,8 @@ def list_activities_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_activities_admin(request, id_activities_admin):
     page = (
@@ -2445,6 +2942,18 @@ def actualizar_activities_admin(request, id_activities_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2488,7 +2997,8 @@ def actualizar_activities_admin(request, id_activities_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_activities_admin.html', context)
 
 def eliminar_activities_admin(request, id_activities_admin):
@@ -2518,6 +3028,18 @@ def about(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2579,7 +3101,8 @@ def about(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
         }
     return render(request, 'mosque_web_app/about.html', context)
 
@@ -2599,6 +3122,18 @@ def about_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2698,7 +3233,8 @@ def about_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = AboutForm()
     
@@ -2718,7 +3254,8 @@ def about_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_about_admin_view(request):
     page = (
@@ -2735,6 +3272,18 @@ def list_about_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2774,7 +3323,8 @@ def list_about_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_about_admin(request, id_about_admin):
     page = (
@@ -2791,6 +3341,18 @@ def actualizar_about_admin(request, id_about_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2834,7 +3396,8 @@ def actualizar_about_admin(request, id_about_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_about_admin.html', context)
 
 def eliminar_about_admin(request, id_about_admin):
@@ -2858,6 +3421,18 @@ def about_images_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -2930,7 +3505,8 @@ def about_images_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = AboutImagesForm()
     
@@ -2950,7 +3526,8 @@ def about_images_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_about_images_admin_view(request):
     page = (
@@ -2967,6 +3544,18 @@ def list_about_images_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3006,7 +3595,8 @@ def list_about_images_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_about_images_admin(request, id_about_images_admin):
     page = (
@@ -3023,6 +3613,18 @@ def actualizar_about_images_admin(request, id_about_images_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3066,7 +3668,8 @@ def actualizar_about_images_admin(request, id_about_images_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_about_images_admin.html', context)
 
 def eliminar_about_images_admin(request, id_about_images_admin):
@@ -3094,6 +3697,18 @@ def contact(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3170,7 +3785,8 @@ def contact(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
     else:
         form = ContactMessageForm()
     
@@ -3190,7 +3806,8 @@ def contact(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_contact_view(request):
     page = (
@@ -3207,6 +3824,18 @@ def list_contact_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3246,7 +3875,8 @@ def list_contact_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_contact(request, id_contact):
     page = (
@@ -3263,6 +3893,18 @@ def actualizar_contact(request, id_contact):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3306,7 +3948,8 @@ def actualizar_contact(request, id_contact):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_contact.html', context)
 
 def eliminar_contact(request, id_contact):
@@ -3331,6 +3974,18 @@ def footer_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3452,7 +4107,8 @@ def footer_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
     else:
         form = FooterForm()
@@ -3473,7 +4129,8 @@ def footer_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_footer_admin_view(request):
     page = (
@@ -3490,6 +4147,18 @@ def list_footer_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3529,7 +4198,8 @@ def list_footer_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_footer_admin(request, id_footer_admin):
     page = (
@@ -3546,6 +4216,18 @@ def actualizar_footer_admin(request, id_footer_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3589,7 +4271,8 @@ def actualizar_footer_admin(request, id_footer_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_footer_admin.html', context)
 
 def eliminar_footer_admin(request, id_footer_admin):
@@ -3615,6 +4298,18 @@ def donation_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3686,7 +4381,8 @@ def donation_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
     else:
         form = DonationForm()
@@ -3707,7 +4403,8 @@ def donation_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_donation_admin_view(request):
     page = (
@@ -3724,6 +4421,18 @@ def list_donation_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3763,7 +4472,8 @@ def list_donation_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_donation_admin(request, id_donation_admin):
     page = (
@@ -3780,6 +4490,18 @@ def actualizar_donation_admin(request, id_donation_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3823,7 +4545,8 @@ def actualizar_donation_admin(request, id_donation_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_donation_admin.html', context)
 
 def eliminar_donation_admin(request, id_donation_admin):
@@ -3848,6 +4571,18 @@ def post_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -3925,7 +4660,8 @@ def post_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
     else:
         form = PostForm()
@@ -3946,7 +4682,8 @@ def post_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 
 def list_post_admin_view(request):
@@ -3964,6 +4701,18 @@ def list_post_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4003,7 +4752,8 @@ def list_post_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_post_admin(request, id_post_admin):
     page = (
@@ -4020,6 +4770,18 @@ def actualizar_post_admin(request, id_post_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4063,7 +4825,8 @@ def actualizar_post_admin(request, id_post_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_post_admin.html', context)
 
 def eliminar_post_admin(request, id_post_admin):
@@ -4089,6 +4852,18 @@ def contact_info_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4176,7 +4951,8 @@ def contact_info_admin(request):
                 'contact_info': contact_info,
                 'page': page,
                 'tabs': tabs,
-                'tab_pages': tab_pages,
+                'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
             })
 
     else:
@@ -4198,7 +4974,8 @@ def contact_info_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def list_contact_info_admin_view(request):
     page = (
@@ -4215,6 +4992,18 @@ def list_contact_info_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4254,7 +5043,8 @@ def list_contact_info_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_contact_info_admin(request, id_contact_info_admin):
     page = (
@@ -4271,6 +5061,18 @@ def actualizar_contact_info_admin(request, id_contact_info_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4314,7 +5116,8 @@ def actualizar_contact_info_admin(request, id_contact_info_admin):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_contact_info_admin.html', context)
 
 def eliminar_contact_info_admin(request, id_contact_info_admin):
@@ -4340,6 +5143,18 @@ def page_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4427,7 +5242,8 @@ def page_admin(request):
                 'contact_info': contact_info,
                 'page': page,
                 'tabs': tabs,
-                'tab_pages': tab_pages,
+                'tab_pages': tab_pages,'read_mores':read_mores,
+                'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
             })
     
     else:
@@ -4449,7 +5265,8 @@ def page_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 
 def list_page_admin_view(request):
@@ -4467,6 +5284,18 @@ def list_page_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4506,7 +5335,8 @@ def list_page_admin_view(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 def actualizar_page_admin(request, id_page_admin):
     page = (
@@ -4523,6 +5353,18 @@ def actualizar_page_admin(request, id_page_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4565,7 +5407,8 @@ def actualizar_page_admin(request, id_page_admin):
         'footer_site_name_footer': footer_site_name_footer,
         'contact_info': contact_info,
         'page': page,'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_page_admin.html', context)
 
 def eliminar_page_admin(request, id_page_admin):
@@ -4590,6 +5433,18 @@ def best_videos(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4633,7 +5488,8 @@ def best_videos(request):
         'page': page,
         'bestVideos': bestVideos,
         'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/best_videos.html',context )
 
 
@@ -4656,6 +5512,18 @@ def best_videos_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4735,7 +5603,8 @@ def best_videos_admin(request):
                 'contact_info': contact_info,
                 'page': page,
                 'tabs': tabs,
-                'tab_pages': tab_pages,
+                'tab_pages': tab_pages,'read_mores':read_mores,
+                'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
             })
     else:
         form = BestVideosForm()
@@ -4759,7 +5628,8 @@ def best_videos_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
     })
 
 
@@ -4778,6 +5648,18 @@ def list_best_videos_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4816,7 +5698,8 @@ def list_best_videos_admin_view(request):
         'footer_site_name_footer': footer_site_name_footer,
         'contact_info': contact_info,
         'page': page,'tabs': tabs,
-        'tab_pages': tab_pages,})
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,})
 
 
 def actualizar_best_videos_admin(request, id_best_videos_admin):
@@ -4834,6 +5717,18 @@ def actualizar_best_videos_admin(request, id_best_videos_admin):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4876,7 +5771,8 @@ def actualizar_best_videos_admin(request, id_best_videos_admin):
         'footer_site_name_footer': footer_site_name_footer,
         'contact_info': contact_info,
         'page': page,'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/actualizar_best_videos_admin.html', context)
 
 def eliminar_best_videos_admin(request, id_best_videos_admin):
@@ -4903,6 +5799,18 @@ def tab_admin(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -4990,7 +5898,8 @@ def tab_admin(request):
                 'contact_info': contact_info,
                 'page': page,
                 'tabs': tabs,
-                'tab_pages': tab_pages,
+                'tab_pages': tab_pages,'read_mores':read_mores,
+                'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
             })
     else:
         form = TabForm()
@@ -5014,7 +5923,8 @@ def tab_admin(request):
         'contact_info': contact_info,
         'page': page,
         'tabs': tabs,
-        'tab_pages': tab_pages,
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
     })
 
 
@@ -5043,6 +5953,18 @@ def mosque_web_admin_view(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -5080,7 +6002,8 @@ def mosque_web_admin_view(request):
         'footer_site_name_footer': footer_site_name_footer,
         'contact_info': contact_info,
         'page': page,'tabs': tabs,
-        'tab_pages': tab_pages,}
+        'tab_pages': tab_pages,'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,}
     return render(request, 'mosque_web_app/mosque_web_admin.html',context )
 
 def custom_logout_view(request):
@@ -5114,6 +6037,18 @@ def home(request):
     tabs = Tab.objects.filter(is_active=True)  # Solo pestañas activas
     
     tab_pages = TabPage.objects.all()
+    
+    read_mores = ReadMore.objects.filter(is_active=True)
+    
+    learn_mores = LearnMore.objects.filter(is_active=True)
+    
+    join_now = JoinNow.objects.filter(is_active=True).last()
+    
+    join_nows = JoinNow.objects.filter(is_active=True)
+    
+    more_detailss = MoreDetails.objects.filter(is_active=True)
+    
+    donate_nows = DonateNow.objects.filter(is_active=True)
     
     # Obtener el último footer (si existe)
     footer = Footer.objects.latest('created_at') if Footer.objects.exists() else None
@@ -5192,6 +6127,7 @@ def home(request):
         'contact_info': contact_info,
         'page': page,
         'about': about, 'abouts_images': abouts_images, 'team_members': team_members, 'president': president,
-        'other_members': other_members, 'testimonials': testimonials, 'last_activity': last_activity, 'events': events, 'sermons': sermons, 'blogs': blogs,'tabs': tabs,'tab_pages': tab_pages,
+        'other_members': other_members, 'testimonials': testimonials, 'last_activity': last_activity, 'events': events, 'sermons': sermons, 'blogs': blogs,'tabs': tabs,'tab_pages': tab_pages, 'read_mores':read_mores,
+        'learn_mores': learn_mores, 'join_nows': join_nows, 'more_detailss': more_detailss, 'donate_nows': donate_nows,
     }
     return render(request, 'mosque_web_app/home.html', context)

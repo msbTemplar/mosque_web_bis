@@ -465,3 +465,140 @@ class TabPage(models.Model):
 
     def __str__(self):
         return self.tab_page_name
+
+
+class ReadMore(models.Model):
+    DAYS_OF_WEEK = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
+    read_more_slug = models.SlugField(unique=True, help_text="Identificador único de la pestaña (ej: home, about, event)")
+    read_more_nombre = models.CharField(max_length=100)
+    read_more_description = models.TextField()
+    read_more_url = models.URLField(blank=True, null=True, verbose_name="Read More URL")
+    read_more_img_url = models.ImageField(upload_to='read_more_img_url_images/', max_length=5500, blank=True, null=True)
+    read_more_file = models.FileField(upload_to='read_more_file_files/', max_length=5500, blank=True, null=True)  # Para subir
+    read_more_date_page = models.DateField(help_text="Fecha de read more", blank=True, null=True)
+    read_more_time_page = models.TimeField(help_text="Hora de read more", blank=True, null=True)
+    read_more_day_page = models.CharField(max_length=9, choices=DAYS_OF_WEEK)  # Día seleccionado del combo
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Fecha en la que se creó el read more.")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Última vez que se actualizó el read more.")
+    is_active = models.BooleanField(default=True, help_text="Define si este read more está activo y visible.")
+    
+    def __str__(self):
+        return f'{self.read_more_nombre} - {self.read_more_description}'
+    
+    
+class LearnMore(models.Model):
+    DAYS_OF_WEEK = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
+    
+    learn_more_slug = models.SlugField(unique=True, help_text="Identificador único de la pestaña (ej: home, about, event)")
+    learn_more_nombre = models.CharField(max_length=100)
+    learn_more_description = models.TextField()
+    learn_more_url = models.URLField(blank=True, null=True, verbose_name="Learn More URL")
+    learn_more_img_url = models.ImageField(upload_to='learn_more_img_url_images/', max_length=5500, blank=True, null=True)
+    learn_more_file = models.FileField(upload_to='learn_more_file_files/', max_length=5500, blank=True, null=True)
+    learn_more_date_page = models.DateField(help_text="Fecha de Learn More", blank=True, null=True)
+    learn_more_time_page = models.TimeField(help_text="Hora de Learn More", blank=True, null=True)
+    learn_more_day_page = models.CharField(max_length=9, choices=DAYS_OF_WEEK)  # Día seleccionado del combo
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Fecha en la que se creó el Learn More.")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Última vez que se actualizó el Learn More.")
+    is_active = models.BooleanField(default=True, help_text="Define si este Learn More está activo y visible.")
+
+    def __str__(self):
+        return f'{self.learn_more_nombre} - {self.learn_more_description}'
+
+class JoinNow(models.Model):
+    DAYS_OF_WEEK = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
+    
+    join_now_slug = models.SlugField(unique=True, help_text="Identificador único de la pestaña (ej: home, about, event)")
+    join_now_nombre = models.CharField(max_length=100)
+    join_now_description = models.TextField()
+    join_now_url = models.URLField(blank=True, null=True, verbose_name="Join Now URL")
+    join_now_img_url = models.ImageField(upload_to='join_now_img_url_images/', max_length=5500, blank=True, null=True)
+    join_now_file = models.FileField(upload_to='join_now_file_files/', max_length=5500, blank=True, null=True)
+    join_now_date_page = models.DateField(help_text="Fecha de Join Now", blank=True, null=True)
+    join_now_time_page = models.TimeField(help_text="Hora de Join Now", blank=True, null=True)
+    join_now_day_page = models.CharField(max_length=9, choices=DAYS_OF_WEEK)  # Día seleccionado del combo
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Fecha en la que se creó el Join Now.")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Última vez que se actualizó el Join Now.")
+    is_active = models.BooleanField(default=True, help_text="Define si este Join Now está activo y visible.")
+
+    def __str__(self):
+        return f'{self.join_now_nombre} - {self.join_now_description}'
+
+
+class MoreDetails(models.Model):
+    DAYS_OF_WEEK = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
+    
+    more_details_slug = models.SlugField(unique=True, help_text="Identificador único de la sección (ej: home, about, event)")
+    more_details_nombre = models.CharField(max_length=100)
+    more_details_description = models.TextField()
+    more_details_url = models.URLField(blank=True, null=True, verbose_name="More Details URL")
+    more_details_img_url = models.ImageField(upload_to='more_details_img_url_images/', max_length=5500, blank=True, null=True)
+    more_details_file = models.FileField(upload_to='more_details_file_files/', max_length=5500, blank=True, null=True)
+    more_details_date_page = models.DateField(help_text="Fecha de More Details", blank=True, null=True)
+    more_details_time_page = models.TimeField(help_text="Hora de More Details", blank=True, null=True)
+    more_details_day_page = models.CharField(max_length=9, choices=DAYS_OF_WEEK)  # Día seleccionado del combo
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Fecha en la que se creó el More Details.")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Última vez que se actualizó el More Details.")
+    is_active = models.BooleanField(default=True, help_text="Define si este More Details está activo y visible.")
+
+    def __str__(self):
+        return f'{self.more_details_nombre} - {self.more_details_description}'
+
+class DonateNow(models.Model):
+    DAYS_OF_WEEK = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
+    
+    donate_now_slug = models.SlugField(unique=True, help_text="Identificador único de la sección (ej: home, about, event)")
+    donate_now_nombre = models.CharField(max_length=100)
+    donate_now_description = models.TextField()
+    donate_now_url = models.URLField(blank=True, null=True, verbose_name="Donate Now URL")
+    donate_now_img_url = models.ImageField(upload_to='donate_now_img_url_images/', max_length=5500, blank=True, null=True)
+    donate_now_file = models.FileField(upload_to='donate_now_file_files/', max_length=5500, blank=True, null=True)
+    donate_now_date_page = models.DateField(help_text="Fecha de Donate Now", blank=True, null=True)
+    donate_now_time_page = models.TimeField(help_text="Hora de Donate Now", blank=True, null=True)
+    donate_now_day_page = models.CharField(max_length=9, choices=DAYS_OF_WEEK)  # Día seleccionado del combo
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Fecha en la que se creó el Donate Now.")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Última vez que se actualizó el Donate Now.")
+    is_active = models.BooleanField(default=True, help_text="Define si este Donate Now está activo y visible.")
+
+    def __str__(self):
+        return f'{self.donate_now_nombre} - {self.donate_now_description}'
